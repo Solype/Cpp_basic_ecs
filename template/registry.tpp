@@ -19,6 +19,7 @@ template <class Component>
 sparse_array<Component> &registry::register_component()
 {
     std::type_index type = typeid(Component);
+
     if (this->_components_arrays.find(type) == this->_components_arrays.end()) {
         this->_components_arrays[type] = sparse_array<Component>();
         this->_destructors[type] = [&](registry &reg, entity const &e) {
@@ -33,6 +34,15 @@ sparse_array<Component> &registry::register_component()
 
     }
     return std::any_cast<sparse_array<Component>&>(this->_components_arrays[type]);
+}
+
+template <class Component>
+void registry::unregister_component()
+{
+    std::type_index type = typeid(Component);
+
+    this->_destructors.erase(type);
+    this->_components_arrays.erase(type);
 }
 
 template <class Component>
@@ -113,7 +123,7 @@ void registry::run_single_system()
 }
 
 template<typename Function>
-void registry::remove_system()
+void registry::unregister_syste()
 {
     auto id = typeid(Function);
 

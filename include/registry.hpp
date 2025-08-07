@@ -87,7 +87,7 @@ class registry {
          * @brief Register a component in the registry.
          * @tparam Component 
          * @return The sparse array of the component just registered
-        */
+         */
         template <class Component>
         sparse_array<Component> &register_component();
 
@@ -95,7 +95,7 @@ class registry {
          * @brief Retrieve the sparse array of a registered component
          * @tparam Component 
          * @return the sparse array of the component
-        */
+         */
         template <class Component>
         sparse_array<Component> &get_components();
 
@@ -103,9 +103,16 @@ class registry {
          * @brief Retrieve the sparse array of a registered component but const
          * @tparam Component 
          * @return the sparse array of the component as const
-        */
+         */
         template <class Component>
         sparse_array<Component> const &get_components() const;
+
+        /**
+         * @brief Register a component in the registry.
+         * @tparam the component to unregister
+         */
+        template <class Component>
+        void unregister_component();
 
         /// @}
         /////////////////////////////////////////////////////////////
@@ -121,21 +128,21 @@ class registry {
          * @note this function will increment the total entity count
          * or take an entity from the unused entities set
          * @return the new entity
-        */
+         */
         entity create_entity();
 
         /**
          * @brief Retrieve an entity from its index
          * @param idx the index of the entity
          * @return the entity
-        */
+         */
         entity entity_from_index(std::size_t idx);
 
         /**
          * @brief Delete all the components of an entity
          * @param e the entity to delete and add the unused entity to
          * the unused entities set
-        */
+         */
         void delete_entity(entity const &e);
 
         /// @}
@@ -154,7 +161,7 @@ class registry {
          * @param to : the entity to add the component to
          * @param ...p : the parameters to pass to the constructor of the component
          * @return return the component just added
-        */
+         */
         template<typename Component, typename ...Params>
         typename sparse_array<Component>::reference_type emplace_component(entity const &to, Params &&...p);
 
@@ -162,7 +169,7 @@ class registry {
          * @brief remove a component from an entity
          * @tparam Component the component to remove
          * @param from the entity to remove the component from
-        */
+         */
         template<typename Component>
         void remove_component(entity const &from);
 
@@ -198,7 +205,7 @@ class registry {
          * it removes the system from the registry.
          */
         template<typename Function>
-        void remove_system();
+        void unregister_syste();
 
         /**
          * @tparam Funciton, the system to enable
@@ -217,7 +224,7 @@ class registry {
 
         /**
          * @brief run all the enabled systems in the registry
-        */
+         */
         void run_systems();
 
         /**
