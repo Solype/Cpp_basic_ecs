@@ -1,11 +1,28 @@
 #include <stdexcept>
 #include <iostream>
 #include <chrono>
+#include <cxxabi.h>
+#include <memory>
 
 #ifndef REGISTRY_TPP_
     #define REGISTRY_TPP_
 
 #include "registry.hpp"
+
+template <typename T>
+static std::string get_type_name()
+{
+    const char* mangled = typeid(T).name();
+    int status = 0;
+
+    std::unique_ptr<char, void(*)(void*)> demangled(
+        abi::__cxa_demangle(mangled, nullptr, nullptr, &status),
+        std::free
+    );
+
+    return (status == 0) ? demangled.get() : mangled;
+}
+
 
 namespace ecs {
 
@@ -52,7 +69,7 @@ sparse_array<Component>& registry::get_components()
 
     if (this->_components_arrays.find(type) == this->_components_arrays.end()) {
         std::string error("Component not registered in registry ");
-        throw std::runtime_error(error + type.name());
+        throw std::runtime_error(error + get_type_name<Component>());
     }
     std::any_cast<sparse_array<Component>&>(this->_components_arrays.at(type));
     return std::any_cast<sparse_array<Component>&>(this->_components_arrays.at(type));
@@ -64,7 +81,7 @@ sparse_array<Component> const& registry::get_components() const
     std::type_index type = typeid(Component);
     if (this->_components_arrays.find(type) == this->_components_arrays.end()) {
         std::string error("Component not registered in registry ");
-        throw std::runtime_error(error + type.name());
+        throw std::runtime_error(error + get_type_name<Component>());
     }
     return std::any_cast<sparse_array<Component> const&>(this->_components_arrays.at(type));
 }
@@ -139,6 +156,8 @@ void registry::enable_system()
 
     if (it != this->_systems.end()) {
         this->_enabled_systems.insert(id);
+    } else {
+        std::cerr << "Not blocking error : system " << get_type_name<Function>() << " not registered" << std::endl;
     }
 }
 
